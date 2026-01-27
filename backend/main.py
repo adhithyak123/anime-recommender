@@ -1,32 +1,48 @@
 from fastapi import FastAPI
-from supabase import create_client
-from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
+from supabase import create_client, Client
+from recommender import get_recommendations
 import os
-from recommender import get_recommendations  # ← Add this import
+from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
 
 app = FastAPI()
 
-# Initialize Supabase
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+# ✨ ADD CORS MIDDLEWARE - This allows frontend to talk to backend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # React app URL
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
+
+# Initialize Supabase client
+supabase_url = os.getenv("SUPABASE_URL")
+supabase_key = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(supabase_url, supabase_key)
 
 @app.get("/")
-def root():
+def read_root():
     return {"message": "Anime Recommender API"}
 
 @app.get("/recommend/{user_id}")
-def get_recommendations_endpoint(user_id: str):
-    # Get user's ratings from database
+def recommend(user_id: str):
+    """
+    Get anime recommendations for a user
+    """
+    # Fetch user's ratings from Supabase
     response = supabase.table("ratings").select("anime_id, rating").eq("user_id", user_id).execute()
+    
     user_ratings = response.data
     
-    # Get recommendations using our algorithm
-    recommendations = get_recommendations(user_ratings, None)
+    # Get recommendations
+    recommendations = get_recommendations(user_ratings)
     
     return {
-        "user_ratings": user_ratings,
+        "user_id": user_id,
+        "total_ratings": len(user_ratings),
         "recommendations": recommendations
     }
