@@ -255,25 +255,50 @@ export default function Dashboard({ session }) {
   }
 
   const getCategoryEmoji = (category) => {
-    const emojiMap = {
-      "Shonen Action & Battle": "⚔️",
-      "Psychological & Thriller": "🧠",
-      "Romance & Slice of Life": "💕",
-      "Fantasy & Adventure": "🗺️",
-      "Comedy & Parody": "😂",
-      "Dark Fantasy & Horror": "🌑",
-      "Sports & Competition": "🏆",
-      "Drama & Emotional": "😢",
-      "Sci-Fi & Mecha": "🤖",
-      "Mystery & Detective": "🔍",
-      "Hidden Gems": "💎",
-      "Because You Rated Highly": "⭐",
-      "Trending Now": "🔥",
-      "Timeless Classics": "👑",
-      "Popular Starters": "🎬"
-    }
-    return emojiMap[category] || "✨"
+  const emojiMap = {
+    "⭐ Top Picks For You": "⭐",
+    "Action": "⚔️",
+    "Adventure": "🗺️",
+    "Comedy": "😂",
+    "Drama": "🎭",
+    "Fantasy": "🔮",
+    "Horror": "👻",
+    "Mystery": "🔍",
+    "Psychological": "🧠",
+    "Romance": "💕",
+    "Sci-Fi": "🚀",
+    "Slice of Life": "☕",
+    "Sports": "🏆",
+    "Supernatural": "✨",
+    "Thriller": "😱",
+    "Mecha": "🤖",
+    "Music": "🎵",
+    "Ecchi": "😳",
+    "Hentai": "🔞",
+    "Mahou Shoujo": "🪄",
+    "Historical": "📜",
+    "Military": "🎖️",
+    "School": "🎒",
+    "Shoujo": "🌸",
+    "Shounen": "⚡",
+    "Seinen": "🗡️",
+    "Josei": "🌹",
+    "Kids": "👶",
+    "Demons": "😈",
+    "Vampire": "🧛",
+    "Cars": "🏎️",
+    "Space": "🌌",
+    "Parody": "🎪",
+    "Police": "👮",
+    "Game": "🎮",
+    "Martial Arts": "🥋",
+    "Samurai": "⚔️",
+    "Super Power": "💪",
+    "Magic": "✨",
+    "Other": "📺"
   }
+  return emojiMap[category] || "✨"
+}
 
   const toggleSection = (sectionName) => {
   setExpandedSections(prev => ({
@@ -771,125 +796,128 @@ const isSectionExpanded = (sectionName) => {
     </div>
   </div>
 )}
-        {/* AI Recommendations Section - By Category */}
-        {Object.keys(recommendationDetails).length > 0 && (
-          <div style={{ marginBottom: '80px' }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              marginBottom: '30px'
-            }}>
-              <h2 style={{
-                fontSize: '32px',
-                fontWeight: '700',
-                margin: 0,
-                background: 'linear-gradient(135deg, #10b981 0%, #3b82f6 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>
-                🤖 AI Recommendations
-              </h2>
-              <div style={{
-                padding: '6px 14px',
-                background: 'rgba(16, 185, 129, 0.15)',
-                borderRadius: '20px',
-                fontSize: '13px',
-                fontWeight: '600',
-                color: '#6ee7b7'
-              }}>
-                {Object.keys(recommendationDetails).length} categories
-              </div>
-            </div>
-            
-            <p style={{
-              color: '#94a3b8',
-              fontSize: '15px',
-              marginBottom: '50px',
-              lineHeight: '1.6'
-            }}>
-              Based on your ratings, we've curated personalized recommendations across multiple genres. The more you rate, the better these get! 🎯
-            </p>
-            
-{/* Loop through each category */}
-{Object.entries(recommendationDetails).map(([category, animeList]) => {
-  const sectionKey = `rec-${category}`
-  const isExpanded = isSectionExpanded(sectionKey)
-  const displayList = isExpanded ? animeList : animeList.slice(0, 12)
-  
-  return (
-    <div key={category} style={{ marginBottom: '60px' }}>
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: '20px'
+{/* AI Recommendations Section - Optimized */}
+{Object.keys(recommendationDetails).length > 0 && (
+  <div style={{ marginBottom: '80px' }}>
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      marginBottom: '30px'
+    }}>
+      <h2 style={{
+        fontSize: '32px',
+        fontWeight: '700',
+        margin: 0,
+        background: 'linear-gradient(135deg, #10b981 0%, #3b82f6 100%)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent'
       }}>
-        <h3 style={{
-          fontSize: '24px',
-          fontWeight: '600',
-          margin: 0,
-          color: '#e2e8f0',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
-          <span>{getCategoryEmoji(category)}</span>
-          <span>{category}</span>
-          <span style={{
-            fontSize: '14px',
-            fontWeight: '500',
-            color: '#64748b',
-            background: 'rgba(16, 185, 129, 0.1)',
-            padding: '4px 12px',
-            borderRadius: '12px'
-          }}>
-            {animeList.length} picks
-          </span>
-        </h3>
-        
-        {animeList.length > 12 && (
-          <button
-            onClick={() => toggleSection(sectionKey)}
-            style={{
-              padding: '8px 16px',
-              background: 'rgba(16, 185, 129, 0.2)',
-              border: '1px solid rgba(16, 185, 129, 0.3)',
-              borderRadius: '8px',
-              color: '#6ee7b7',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '600',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => e.target.style.background = 'rgba(16, 185, 129, 0.3)'}
-            onMouseLeave={(e) => e.target.style.background = 'rgba(16, 185, 129, 0.2)'}
-          >
-            {isExpanded ? '▲ Show Less' : `▼ Show All (${animeList.length})`}
-          </button>
-        )}
-      </div>
-      
+        🤖 AI Recommendations
+      </h2>
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-        gap: '24px'
+        padding: '6px 14px',
+        background: 'rgba(16, 185, 129, 0.15)',
+        borderRadius: '20px',
+        fontSize: '13px',
+        fontWeight: '600',
+        color: '#6ee7b7'
       }}>
-        {displayList.map(anime => (
-          <PremiumCard 
-            key={anime.id} 
-            anime={anime} 
-            userRating={getUserRating(anime.id)} 
-            onRate={rateAnime}
-            isRecommendation={true}
-          />
-        ))}
+        {Object.keys(recommendationDetails).length} categories
       </div>
     </div>
-  )
-})}
+    
+    <p style={{
+      color: '#94a3b8',
+      fontSize: '15px',
+      marginBottom: '50px',
+      lineHeight: '1.6'
+    }}>
+      Personalized recommendations based on your taste, powered by Anilist's community data. Rate more to discover hidden gems! 🎯
+    </p>
+    
+    {/* Loop through each category */}
+    {Object.entries(recommendationDetails).map(([category, animeList], categoryIndex) => {
+      const sectionKey = `rec-${category}`
+      const isExpanded = isSectionExpanded(sectionKey)
+      const displayList = isExpanded ? animeList : animeList.slice(0, 12)
+      
+      // Skip empty categories
+      if (animeList.length === 0) return null
+      
+      return (
+        <div key={category} style={{ marginBottom: '60px' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '20px'
+          }}>
+            <h3 style={{
+              fontSize: '24px',
+              fontWeight: '600',
+              margin: 0,
+              color: '#e2e8f0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              <span>{getCategoryEmoji(category)}</span>
+              <span>{category}</span>
+              <span style={{
+                fontSize: '14px',
+                fontWeight: '500',
+                color: '#64748b',
+                background: 'rgba(16, 185, 129, 0.1)',
+                padding: '4px 12px',
+                borderRadius: '12px'
+              }}>
+                {animeList.length} picks
+              </span>
+            </h3>
+            
+            {animeList.length > 12 && (
+              <button
+                onClick={() => toggleSection(sectionKey)}
+                style={{
+                  padding: '8px 16px',
+                  background: 'rgba(16, 185, 129, 0.2)',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  borderRadius: '8px',
+                  color: '#6ee7b7',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.background = 'rgba(16, 185, 129, 0.3)'}
+                onMouseLeave={(e) => e.target.style.background = 'rgba(16, 185, 129, 0.2)'}
+              >
+                {isExpanded ? '▲ Show Less' : `▼ Show All (${animeList.length})`}
+              </button>
+            )}
           </div>
-        )}
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+            gap: '24px'
+          }}>
+            {displayList.map((anime, index) => (
+              <PremiumCard 
+                key={`${anime.id}-${categoryIndex}-${index}`}
+                anime={anime} 
+                userRating={getUserRating(anime.id)} 
+                onRate={rateAnime}
+                isRecommendation={true}
+              />
+            ))}
+          </div>
+        </div>
+      )
+    })}
+  </div>
+)}
       </div>
 
       {/* Scroll to Top Button */}
