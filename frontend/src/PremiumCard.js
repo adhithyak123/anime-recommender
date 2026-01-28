@@ -21,6 +21,16 @@ export default function PremiumCard({ anime, userRating, onRate, isRecommendatio
     setTimeout(() => setAddingToWatchlist(false), 1000)
   }
 
+  const getHiAnimeUrl = (anime) => {
+    const title = anime.title.english || anime.title.romaji
+    return `https://hianime.to/search?keyword=${encodeURIComponent(title)}`
+  }
+
+  const handleWatch = (e) => {
+    e.stopPropagation()
+    window.open(getHiAnimeUrl(anime), '_blank')
+  }
+
   return (
     <div 
       onMouseEnter={() => setShow(true)}
@@ -118,6 +128,39 @@ export default function PremiumCard({ anime, userRating, onRate, isRecommendatio
               ))}
             </div>
           )}
+
+          {/* Watch Now Button */}
+          <button
+            onClick={handleWatch}
+            style={{
+              width: '100%',
+              padding: '12px',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
+              border: 'none',
+              borderRadius: '8px',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '700',
+              marginBottom: '12px',
+              transition: 'all 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 12px rgba(139, 92, 246, 0.4)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'scale(1.02)'
+              e.target.style.boxShadow = '0 6px 16px rgba(139, 92, 246, 0.6)'
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'scale(1)'
+              e.target.style.boxShadow = '0 4px 12px rgba(139, 92, 246, 0.4)'
+            }}
+          >
+            ▶️ Watch Now
+          </button>
 
           {onAddToWatchlist && !isInWatchlist && (
             <button
