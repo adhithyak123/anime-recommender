@@ -10,13 +10,16 @@ load_dotenv()
 
 app = FastAPI()
 
-# ✨ ADD CORS MIDDLEWARE - This allows frontend to talk to backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React app URL
+    allow_origins=[
+        "http://localhost:3000",  # Local development
+        "https://*.vercel.app",   # All Vercel deployments
+        # Add your custom domain here later if you get one
+    ],
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Initialize Supabase client

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from './supabaseClient'
 import axios from 'axios'
 import HomePage from './HomePage'
@@ -7,7 +7,6 @@ import RecommendationsPage from './RecommendationsPage'
 import SearchPage from './SearchPage'
 import WatchlistPage from './WatchlistPage'
 
-// Global styles
 const globalStyles = `
   * {
     scroll-behavior: smooth;
@@ -15,24 +14,25 @@ const globalStyles = `
   
   body {
     overflow-x: hidden;
+    margin: 0;
+    padding: 0;
   }
   
   ::-webkit-scrollbar {
-    width: 12px;
+    width: 10px;
   }
   
   ::-webkit-scrollbar-track {
-    background: #0f1729;
+    background: #0f172a;
   }
   
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 10px;
-    border: 2px solid #0f1729;
+    background: #475569;
+    border-radius: 5px;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    background: #64748b;
   }
 `
 
@@ -45,13 +45,10 @@ export default function Dashboard({ session }) {
   const [watchlistDetails, setWatchlistDetails] = useState([])
   const [recommendationDetails, setRecommendationDetails] = useState({})
   const [showScrollTop, setShowScrollTop] = useState(false)
-  
-  // Loading states
   const [loadingRatings, setLoadingRatings] = useState(false)
   const [loadingWatchlist, setLoadingWatchlist] = useState(false)
   const [loadingRecommendations, setLoadingRecommendations] = useState(false)
 
-  // Add global styles
   useEffect(() => {
     const styleTag = document.createElement('style')
     styleTag.innerHTML = globalStyles
@@ -62,7 +59,6 @@ export default function Dashboard({ session }) {
     }
   }, [])
 
-  // Detect scroll for scroll-to-top button
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 500)
@@ -78,7 +74,6 @@ export default function Dashboard({ session }) {
 
   const loadInitialData = async () => {
     try {
-      // Load everything in parallel for speed
       const [ratingsResult, watchlistResult] = await Promise.all([
         supabase.from('ratings').select('anime_id, rating').eq('user_id', session.user.id),
         supabase.from('watchlist').select('anime_id').eq('user_id', session.user.id)
@@ -87,7 +82,6 @@ export default function Dashboard({ session }) {
       setMyRatings(ratingsResult.data || [])
       setWatchlist(watchlistResult.data || [])
       
-      // Fetch details in parallel
       const fetchPromises = []
       
       if (ratingsResult.data && ratingsResult.data.length > 0) {
@@ -107,24 +101,23 @@ export default function Dashboard({ session }) {
     }
   }
 
-  // Memoize this to prevent unnecessary re-fetches
   const fetchRecommendations = useCallback(async () => {
-    if (loadingRecommendations) return // Prevent duplicate requests
+    if (loadingRecommendations) return
     
     setLoadingRecommendations(true)
     try {
-      console.log('🔍 Fetching recommendations...')
+      // USE ENVIRONMENT VARIABLE HERE
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000'
       
       const response = await axios.get(
-        `http://localhost:8000/recommend/${session.user.id}`,
-        { timeout: 15000 } // 15 second timeout
+        `${API_URL}/recommend/${session.user.id}`,
+        { timeout: 15000 }
       )
       
       const recsByCategory = response.data.recommendations || {}
       const allIds = Object.values(recsByCategory).flat()
       
       if (allIds.length > 0) {
-        // Fetch anime details with timeout
         const recResponse = await axios.post(
           'https://graphql.anilist.co',
           {
@@ -156,13 +149,9 @@ export default function Dashboard({ session }) {
         }
         
         setRecommendationDetails(detailsByCategory)
-        console.log('✅ Recommendations loaded')
       }
     } catch (error) {
-      console.error('❌ Error fetching recommendations:', error)
-      if (error.code === 'ECONNABORTED') {
-        alert('Recommendations are taking too long to load. Please try again.')
-      }
+      console.error('Error fetching recommendations:', error)
     } finally {
       setLoadingRecommendations(false)
     }
@@ -173,7 +162,6 @@ export default function Dashboard({ session }) {
     
     setLoadingRatings(true)
     try {
-      // Split into chunks of 50 to avoid overwhelming the API
       const chunkSize = 50
       const chunks = []
       for (let i = 0; i < animeIds.length; i += chunkSize) {
@@ -218,7 +206,6 @@ export default function Dashboard({ session }) {
     
     setLoadingWatchlist(true)
     try {
-      // Split into chunks
       const chunkSize = 50
       const chunks = []
       for (let i = 0; i < animeIds.length; i += chunkSize) {
@@ -260,8 +247,6 @@ export default function Dashboard({ session }) {
 
   const addToWatchlist = async (animeId) => {
     try {
-      console.log('📝 Adding to watchlist:', animeId)
-      
       const { error } = await supabase
         .from('watchlist')
         .insert({ user_id: session.user.id, anime_id: animeId })
@@ -271,7 +256,6 @@ export default function Dashboard({ session }) {
       const newWatchlist = [...watchlist, { anime_id: animeId }]
       setWatchlist(newWatchlist)
       
-      // Fetch details for just the new anime (not all)
       const response = await axios.post('https://graphql.anilist.co', {
         query: `
           query ($id: Int) {
@@ -291,22 +275,16 @@ export default function Dashboard({ session }) {
       if (newAnime) {
         setWatchlistDetails([...watchlistDetails, newAnime])
       }
-      
-      console.log('✅ Added to watchlist!')
     } catch (error) {
-      console.error('❌ Error adding to watchlist:', error)
+      console.error('Error adding to watchlist:', error)
       if (error.code === '23505') {
-        alert('Already in watchlist!')
-      } else {
-        alert('Failed to add to watchlist: ' + error.message)
+        alert('Already in watchlist')
       }
     }
   }
 
   const removeFromWatchlist = async (animeId) => {
     try {
-      console.log('🗑️ Removing from watchlist:', animeId)
-      
       const { error } = await supabase
         .from('watchlist')
         .delete()
@@ -317,18 +295,13 @@ export default function Dashboard({ session }) {
       
       setWatchlist(watchlist.filter(w => w.anime_id !== animeId))
       setWatchlistDetails(watchlistDetails.filter(a => a.id !== animeId))
-      
-      console.log('✅ Removed from watchlist!')
     } catch (error) {
-      console.error('❌ Error removing from watchlist:', error)
-      alert('Failed to remove from watchlist: ' + error.message)
+      console.error('Error removing from watchlist:', error)
     }
   }
 
   const rateAnime = async (animeId, rating) => {
     try {
-      console.log('⭐ Rating anime:', animeId, 'with rating:', rating)
-      
       const { data: existing, error: selectError } = await supabase
         .from('ratings')
         .select('id')
@@ -357,7 +330,6 @@ export default function Dashboard({ session }) {
         const newRatings = [...myRatings, { anime_id: animeId, rating }]
         setMyRatings(newRatings)
         
-        // Only fetch details for the new anime if not already loaded
         if (!ratedAnimeDetails.find(a => a.id === animeId)) {
           const response = await axios.post('https://graphql.anilist.co', {
             query: `
@@ -381,15 +353,11 @@ export default function Dashboard({ session }) {
         }
       }
       
-      console.log('✅ Rating saved!')
-      
-      // Debounce recommendation refresh (don't spam the backend)
       if (!loadingRecommendations) {
         setTimeout(() => fetchRecommendations(), 1000)
       }
     } catch (error) {
-      console.error('💥 Rating error:', error)
-      alert('Failed to save rating: ' + error.message)
+      console.error('Rating error:', error)
     }
   }
 
@@ -402,63 +370,25 @@ export default function Dashboard({ session }) {
     return watchlist.some(w => w.anime_id === animeId)
   }, [watchlist])
 
-  const getCategoryEmoji = (category) => {
-    const emojiMap = {
-      "⭐ Top Picks For You": "⭐",
-      "Action": "⚔️",
-      "Adventure": "🗺️",
-      "Comedy": "😂",
-      "Drama": "🎭",
-      "Fantasy": "🔮",
-      "Horror": "👻",
-      "Mystery": "🔍",
-      "Psychological": "🧠",
-      "Romance": "💕",
-      "Sci-Fi": "🚀",
-      "Slice of Life": "☕",
-      "Sports": "🏆",
-      "Supernatural": "✨",
-      "Thriller": "😱",
-      "Mecha": "🤖",
-      "Music": "🎵",
-      "Ecchi": "😳",
-      "Mahou Shoujo": "🪄",
-      "Historical": "📜",
-      "Military": "🎖️",
-      "School": "🎒",
-      "Shoujo": "🌸",
-      "Shounen": "⚡",
-      "Seinen": "🗡️",
-      "Josei": "🌹",
-      "Kids": "👶",
-      "Other": "📺"
-    }
-    return emojiMap[category] || "✨"
-  }
-
-  // Show loading overlay on initial page load
   const isInitialLoading = loadingRatings && loadingWatchlist && Object.keys(recommendationDetails).length === 0
 
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(to bottom, #0a0e27 0%, #1a1f3a 50%, #0f1729 100%)',
-      color: 'white',
+      background: '#0f172a',
+      color: '#e2e8f0',
       padding: '0',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif',
       position: 'relative',
       overflowY: 'auto',
-      overflowX: 'hidden',
-      scrollBehavior: 'smooth'
+      overflowX: 'hidden'
     }}>
       
-      {/* Loading Overlay */}
       {isInitialLoading && (
         <div style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(10, 14, 39, 0.95)',
-          backdropFilter: 'blur(10px)',
+          background: '#0f172a',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -467,19 +397,19 @@ export default function Dashboard({ session }) {
           gap: '20px'
         }}>
           <div style={{
-            width: '60px',
-            height: '60px',
-            border: '4px solid rgba(102, 126, 234, 0.2)',
-            borderTop: '4px solid #667eea',
+            width: '50px',
+            height: '50px',
+            border: '3px solid #1e293b',
+            borderTop: '3px solid #6366f1',
             borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
+            animation: 'spin 0.8s linear infinite'
           }} />
           <p style={{
-            fontSize: '18px',
-            color: '#a78bfa',
-            fontWeight: '600'
+            fontSize: '15px',
+            color: '#64748b',
+            fontWeight: '500'
           }}>
-            Loading your anime collection...
+            Loading...
           </p>
           <style>{`
             @keyframes spin {
@@ -490,101 +420,82 @@ export default function Dashboard({ session }) {
         </div>
       )}
       
-      {/* Header with Navigation */}
       <div style={{
-        background: 'rgba(15, 23, 42, 0.8)',
-        backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(139, 92, 246, 0.2)',
+        background: 'rgba(15, 23, 42, 0.95)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid #1e293b',
         position: 'sticky',
         top: 0,
-        zIndex: 100,
-        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.3)'
+        zIndex: 100
       }}>
         <div style={{
           maxWidth: '1400px',
           margin: '0 auto',
-          padding: '20px 40px'
+          padding: '16px 40px'
         }}>
-          {/* Logo and Title */}
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '20px'
+            marginBottom: '16px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <div style={{
-                width: '50px',
-                height: '50px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '24px',
-                boxShadow: '0 8px 20px rgba(102, 126, 234, 0.4)'
-              }}>
-                🎬
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <h1 style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                fontSize: '32px',
-                fontWeight: '800',
+                color: '#e2e8f0',
+                fontSize: '24px',
+                fontWeight: '700',
                 margin: 0,
-                letterSpacing: '-1px'
+                letterSpacing: '-0.5px'
               }}>
-                ANIFLIX
+                MyAniBuddy
               </h1>
             </div>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div style={{
-                padding: '8px 16px',
-                background: 'rgba(102, 126, 234, 0.1)',
-                borderRadius: '20px',
-                border: '1px solid rgba(102, 126, 234, 0.3)',
-                fontSize: '14px',
-                color: '#a78bfa'
+                padding: '6px 14px',
+                background: '#1e293b',
+                borderRadius: '6px',
+                fontSize: '13px',
+                color: '#94a3b8'
               }}>
                 {session.user.email}
               </div>
               <button 
                 onClick={() => supabase.auth.signOut()}
                 style={{
-                  padding: '10px 24px',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
+                  padding: '8px 16px',
+                  background: '#1e293b',
+                  color: '#e2e8f0',
+                  border: '1px solid #334155',
+                  borderRadius: '6px',
                   cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
-                  transition: 'transform 0.2s'
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  transition: 'all 0.2s'
                 }}
-                onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
-                onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#334155'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#1e293b'
+                }}
               >
                 Sign Out
               </button>
             </div>
           </div>
 
-          {/* Navigation Tabs */}
           <div style={{
             display: 'flex',
-            gap: '8px',
-            borderBottom: '2px solid rgba(139, 92, 246, 0.1)',
-            paddingBottom: '0'
+            gap: '4px'
           }}>
             {[
-              { id: 'home', label: 'Home', icon: '🏠' },
-              { id: 'watchlist', label: 'Watchlist', icon: '📝', badge: watchlist.length },
-              { id: 'collection', label: 'My Collection', icon: '⭐', badge: myRatings.length },
-              { id: 'recommendations', label: 'AI Picks', icon: '🤖', badge: Object.keys(recommendationDetails).length },
-              { id: 'search', label: 'Search', icon: '🔍' }
+              { id: 'home', label: 'Browse' },
+              { id: 'watchlist', label: 'Watchlist', badge: watchlist.length },
+              { id: 'collection', label: 'My List', badge: myRatings.length },
+              { id: 'recommendations', label: 'For You', badge: Object.keys(recommendationDetails).length },
+              { id: 'search', label: 'Search' }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -593,50 +504,40 @@ export default function Dashboard({ session }) {
                   window.scrollTo({ top: 0, behavior: 'smooth' })
                 }}
                 style={{
-                  padding: '12px 24px',
-                  background: currentPage === tab.id 
-                    ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%)'
-                    : 'transparent',
+                  padding: '10px 20px',
+                  background: currentPage === tab.id ? '#1e293b' : 'transparent',
                   border: 'none',
-                  borderBottom: currentPage === tab.id 
-                    ? '3px solid #667eea'
-                    : '3px solid transparent',
-                  color: currentPage === tab.id ? '#a78bfa' : '#64748b',
+                  borderRadius: '6px',
+                  color: currentPage === tab.id ? '#e2e8f0' : '#64748b',
                   cursor: 'pointer',
-                  fontSize: '15px',
-                  fontWeight: '600',
+                  fontSize: '14px',
+                  fontWeight: '500',
                   transition: 'all 0.2s',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  borderRadius: '8px 8px 0 0'
+                  gap: '8px'
                 }}
                 onMouseEnter={(e) => {
                   if (currentPage !== tab.id) {
-                    e.target.style.background = 'rgba(102, 126, 234, 0.1)'
                     e.target.style.color = '#94a3b8'
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (currentPage !== tab.id) {
-                    e.target.style.background = 'transparent'
                     e.target.style.color = '#64748b'
                   }
                 }}
               >
-                <span>{tab.icon}</span>
                 <span>{tab.label}</span>
                 {tab.badge !== undefined && tab.badge > 0 && (
                   <span style={{
-                    background: currentPage === tab.id 
-                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                      : 'rgba(102, 126, 234, 0.3)',
-                    color: 'white',
-                    padding: '2px 8px',
-                    borderRadius: '12px',
-                    fontSize: '12px',
-                    fontWeight: '700',
-                    minWidth: '20px',
+                    background: currentPage === tab.id ? '#475569' : '#1e293b',
+                    color: '#e2e8f0',
+                    padding: '2px 7px',
+                    borderRadius: '10px',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    minWidth: '18px',
                     textAlign: 'center'
                   }}>
                     {tab.badge}
@@ -648,7 +549,6 @@ export default function Dashboard({ session }) {
         </div>
       </div>
 
-      {/* Main Content Area */}
       <div style={{
         maxWidth: '1400px',
         margin: '0 auto',
@@ -676,6 +576,7 @@ export default function Dashboard({ session }) {
 
         {currentPage === 'collection' && (
           <CollectionPage
+            session={session}
             myRatings={myRatings}
             ratedAnimeDetails={ratedAnimeDetails}
             allAnime={animeList}
@@ -692,27 +593,24 @@ export default function Dashboard({ session }) {
                 padding: '80px 20px'
               }}>
                 <div style={{
-                  width: '60px',
-                  height: '60px',
-                  border: '4px solid rgba(16, 185, 129, 0.2)',
-                  borderTop: '4px solid #10b981',
+                  width: '50px',
+                  height: '50px',
+                  border: '3px solid #1e293b',
+                  borderTop: '3px solid #6366f1',
                   borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
+                  animation: 'spin 0.8s linear infinite',
                   margin: '0 auto 20px'
                 }} />
-                <p style={{ color: '#6ee7b7', fontSize: '18px', fontWeight: '600' }}>
-                  Generating personalized recommendations...
-                </p>
-                <p style={{ color: '#94a3b8', fontSize: '14px', marginTop: '10px' }}>
-                  This may take 5-10 seconds
+                <p style={{ color: '#64748b', fontSize: '15px', fontWeight: '500' }}>
+                  Loading recommendations...
                 </p>
               </div>
             ) : (
               <RecommendationsPage
+                session={session}
                 recommendationDetails={recommendationDetails}
                 onRate={rateAnime}
                 getUserRating={getUserRating}
-                getCategoryEmoji={getCategoryEmoji}
                 onAddToWatchlist={addToWatchlist}
                 isInWatchlist={isInWatchlist}
               />
@@ -722,6 +620,7 @@ export default function Dashboard({ session }) {
 
         {currentPage === 'search' && (
           <SearchPage
+            session={session}
             onRate={rateAnime}
             getUserRating={getUserRating}
             onAddToWatchlist={addToWatchlist}
@@ -730,7 +629,6 @@ export default function Dashboard({ session }) {
         )}
       </div>
 
-      {/* Scroll to Top Button */}
       {showScrollTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -738,28 +636,25 @@ export default function Dashboard({ session }) {
             position: 'fixed',
             bottom: '30px',
             right: '30px',
-            width: '50px',
-            height: '50px',
+            width: '44px',
+            height: '44px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            border: 'none',
-            color: 'white',
-            fontSize: '24px',
+            background: '#1e293b',
+            border: '1px solid #334155',
+            color: '#e2e8f0',
+            fontSize: '18px',
             cursor: 'pointer',
-            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.5)',
             zIndex: 1000,
-            transition: 'all 0.3s',
+            transition: 'all 0.2s',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}
           onMouseEnter={(e) => {
-            e.target.style.transform = 'scale(1.1)'
-            e.target.style.boxShadow = '0 6px 30px rgba(102, 126, 234, 0.7)'
+            e.target.style.background = '#334155'
           }}
           onMouseLeave={(e) => {
-            e.target.style.transform = 'scale(1)'
-            e.target.style.boxShadow = '0 4px 20px rgba(102, 126, 234, 0.5)'
+            e.target.style.background = '#1e293b'
           }}
         >
           ↑

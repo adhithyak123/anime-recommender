@@ -20,7 +20,7 @@ def get_recommendations(user_ratings, all_ratings_data=None, max_per_genre=15):
     all_recommendations = {}  # {anime_id: {'score': X, 'genres': [...]}}
     seen_ids = set([r["anime_id"] for r in user_ratings])
     
-    print(f"🔍 Finding recommendations based on {len(favorites)} favorites...")
+    print(f" Finding recommendations based on {len(favorites)} favorites...")
     
     for fav in favorites[:8]:  # Check top 8 favorites
         similar = fetch_similar_anime_with_genres(fav["anime_id"], fav["rating"])
@@ -56,7 +56,7 @@ def get_recommendations(user_ratings, all_ratings_data=None, max_per_genre=15):
     sorted_genres = sorted(final_recommendations.items(), key=lambda x: len(x[1]), reverse=True)
     final_recommendations = dict(sorted_genres)
     
-    print(f"📊 Organized into {len(final_recommendations)} genres")
+    print(f" Organized into {len(final_recommendations)} genres")
     
     # Always add a mixed "For You" section with top picks across all genres
     all_sorted = sorted(all_recommendations.items(), key=lambda x: x[1]['score'], reverse=True)
@@ -184,7 +184,7 @@ def get_default_recommendations():
             return result
         
     except Exception as e:
-        print(f"❌ Error fetching trending anime: {e}")
+        print(f" Error fetching trending anime: {e}")
     
     return {
         "Trending Now": [5114, 16498, 11061, 1535, 9253, 30276, 38000, 40748, 28851, 32281]

@@ -16,7 +16,7 @@ export default function HomePage({ session, onRate, getUserRating, onAddToWatchl
       const response = await axios.post('https://graphql.anilist.co', {
         query: `
           query {
-            Page(page: 1, perPage: 75) {
+            Page(page: 1, perPage: 24) {
               media(type: ANIME, sort: TRENDING_DESC) {
                 id
                 title { english romaji }
@@ -38,26 +38,33 @@ export default function HomePage({ session, onRate, getUserRating, onAddToWatchl
   return (
     <div>
       <h2 style={{
-        fontSize: '32px',
-        fontWeight: '700',
-        marginBottom: '30px',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent'
+        fontSize: '24px',
+        fontWeight: '600',
+        marginBottom: '24px',
+        color: '#e2e8f0',
+        letterSpacing: '-0.5px'
       }}>
-        🔥 Trending Now
+        Trending Now
       </h2>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>
-          <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔄</div>
-          <p>Loading trending anime...</p>
+        <div style={{ textAlign: 'center', padding: '60px', color: '#64748b' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '3px solid #1e293b',
+            borderTop: '3px solid #6366f1',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+            margin: '0 auto 16px'
+          }} />
+          <p style={{ fontSize: '14px' }}>Loading...</p>
         </div>
       ) : (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-          gap: '24px'
+          gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+          gap: '20px'
         }}>
           {trendingAnime.map(anime => (
             <PremiumCard

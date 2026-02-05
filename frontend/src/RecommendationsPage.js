@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import PremiumCard from './PremiumCard'
 
-export default function RecommendationsPage({ recommendationDetails, onRate, getUserRating, getCategoryEmoji, onAddToWatchlist, isInWatchlist }) {
+export default function RecommendationsPage({ recommendationDetails, onRate, getUserRating, onAddToWatchlist, isInWatchlist }) {
   const [expandedSections, setExpandedSections] = useState({})
 
   const toggleSection = (sectionKey) => {
@@ -21,53 +21,51 @@ export default function RecommendationsPage({ recommendationDetails, onRate, get
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
-        marginBottom: '30px'
+        marginBottom: '24px'
       }}>
         <h2 style={{
-          fontSize: '32px',
-          fontWeight: '700',
+          fontSize: '24px',
+          fontWeight: '600',
           margin: 0,
-          background: 'linear-gradient(135deg, #10b981 0%, #3b82f6 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
+          color: '#e2e8f0',
+          letterSpacing: '-0.5px'
         }}>
-          🤖 AI Recommendations
+          Recommended For You
         </h2>
         <div style={{
-          padding: '6px 14px',
-          background: 'rgba(16, 185, 129, 0.15)',
-          borderRadius: '20px',
-          fontSize: '13px',
-          fontWeight: '600',
-          color: '#6ee7b7'
+          padding: '4px 10px',
+          background: '#1e293b',
+          borderRadius: '6px',
+          fontSize: '12px',
+          fontWeight: '500',
+          color: '#94a3b8'
         }}>
-          {Object.keys(recommendationDetails).length} categories
+          {Object.keys(recommendationDetails).length}
         </div>
       </div>
 
       <p style={{
-        color: '#94a3b8',
-        fontSize: '15px',
-        marginBottom: '50px',
+        color: '#64748b',
+        fontSize: '14px',
+        marginBottom: '40px',
         lineHeight: '1.6'
       }}>
-        Personalized recommendations based on your taste, powered by Anilist's community data. 🎯
+        Personalized picks based on what you've watched and rated.
       </p>
 
       {Object.keys(recommendationDetails).length === 0 ? (
         <div style={{
           textAlign: 'center',
           padding: '80px 20px',
-          background: 'rgba(16, 185, 129, 0.05)',
-          borderRadius: '20px',
-          border: '1px solid rgba(16, 185, 129, 0.1)'
+          background: '#1e293b',
+          borderRadius: '12px',
+          border: '1px solid #334155'
         }}>
-          <div style={{ fontSize: '64px', marginBottom: '20px' }}>🤖</div>
-          <h3 style={{ color: '#6ee7b7', fontSize: '24px', marginBottom: '12px' }}>
-            No Recommendations Yet
+          <h3 style={{ color: '#e2e8f0', fontSize: '18px', marginBottom: '8px', fontWeight: '600' }}>
+            No recommendations yet
           </h3>
-          <p style={{ color: '#94a3b8', fontSize: '16px' }}>
-            Rate at least 3-5 anime to get personalized recommendations!
+          <p style={{ color: '#64748b', fontSize: '14px' }}>
+            Rate at least 5 shows to get personalized recommendations.
           </p>
         </div>
       ) : (
@@ -79,33 +77,33 @@ export default function RecommendationsPage({ recommendationDetails, onRate, get
           if (animeList.length === 0) return null
           
           return (
-            <div key={category} style={{ marginBottom: '60px' }}>
+            <div key={category} style={{ marginBottom: '50px' }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginBottom: '20px'
+                marginBottom: '16px'
               }}>
                 <h3 style={{
-                  fontSize: '24px',
+                  fontSize: '18px',
                   fontWeight: '600',
                   margin: 0,
                   color: '#e2e8f0',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '10px'
+                  gap: '10px',
+                  letterSpacing: '-0.3px'
                 }}>
-                  <span>{getCategoryEmoji(category)}</span>
                   <span>{category}</span>
                   <span style={{
-                    fontSize: '14px',
+                    fontSize: '12px',
                     fontWeight: '500',
                     color: '#64748b',
-                    background: 'rgba(16, 185, 129, 0.1)',
-                    padding: '4px 12px',
-                    borderRadius: '12px'
+                    background: '#1e293b',
+                    padding: '3px 8px',
+                    borderRadius: '6px'
                   }}>
-                    {animeList.length} picks
+                    {animeList.length}
                   </span>
                 </h3>
                 
@@ -113,28 +111,28 @@ export default function RecommendationsPage({ recommendationDetails, onRate, get
                   <button
                     onClick={() => toggleSection(sectionKey)}
                     style={{
-                      padding: '8px 16px',
-                      background: 'rgba(16, 185, 129, 0.2)',
-                      border: '1px solid rgba(16, 185, 129, 0.3)',
-                      borderRadius: '8px',
-                      color: '#6ee7b7',
+                      padding: '6px 12px',
+                      background: '#1e293b',
+                      border: '1px solid #334155',
+                      borderRadius: '6px',
+                      color: '#94a3b8',
                       cursor: 'pointer',
-                      fontSize: '14px',
-                      fontWeight: '600',
+                      fontSize: '12px',
+                      fontWeight: '500',
                       transition: 'all 0.2s'
                     }}
-                    onMouseEnter={(e) => e.target.style.background = 'rgba(16, 185, 129, 0.3)'}
-                    onMouseLeave={(e) => e.target.style.background = 'rgba(16, 185, 129, 0.2)'}
+                    onMouseEnter={(e) => e.target.style.background = '#334155'}
+                    onMouseLeave={(e) => e.target.style.background = '#1e293b'}
                   >
-                    {isExpanded ? '▲ Show Less' : `▼ Show All (${animeList.length})`}
+                    {isExpanded ? 'Show Less' : `Show All (${animeList.length})`}
                   </button>
                 )}
               </div>
               
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                gap: '24px'
+                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                gap: '20px'
               }}>
                 {displayList.map((anime, index) => (
                   <PremiumCard 

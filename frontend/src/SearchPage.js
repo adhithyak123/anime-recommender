@@ -38,69 +38,51 @@ export default function SearchPage({ onRate, getUserRating, onAddToWatchlist, is
   return (
     <div>
       <h2 style={{
-        fontSize: '32px',
-        fontWeight: '700',
-        marginBottom: '30px',
-        background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 100%)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent'
+        fontSize: '24px',
+        fontWeight: '600',
+        marginBottom: '24px',
+        color: '#e2e8f0',
+        letterSpacing: '-0.5px'
       }}>
-        🔍 Search Anime
+        Search
       </h2>
 
       <div style={{
-        maxWidth: '700px',
-        margin: '0 auto 60px',
+        maxWidth: '600px',
+        margin: '0 0 40px 0',
         display: 'flex',
-        gap: '12px',
-        background: 'rgba(255, 255, 255, 0.03)',
-        padding: '8px',
-        borderRadius: '16px',
-        border: '1px solid rgba(139, 92, 246, 0.2)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+        gap: '10px'
       }}>
-        <div style={{ position: 'relative', flex: 1 }}>
-          <span style={{
-            position: 'absolute',
-            left: '16px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            fontSize: '20px',
-            opacity: 0.5
-          }}>
-            🔍
-          </span>
-          <input
-            type="text"
-            placeholder="Search thousands of anime..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && searchAnime()}
-            style={{
-              width: '100%',
-              padding: '16px 16px 16px 50px',
-              fontSize: '16px',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: '12px',
-              color: 'white',
-              outline: 'none'
-            }}
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Search anime..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && searchAnime()}
+          style={{
+            flex: 1,
+            padding: '12px 16px',
+            fontSize: '14px',
+            background: '#1e293b',
+            border: '1px solid #334155',
+            borderRadius: '8px',
+            color: '#e2e8f0',
+            outline: 'none'
+          }}
+        />
         <button 
           onClick={searchAnime}
           disabled={loading || !searchTerm}
           style={{
-            padding: '16px 32px',
-            background: (loading || !searchTerm) ? 'rgba(102, 126, 234, 0.3)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white',
+            padding: '12px 24px',
+            background: (!loading && searchTerm) ? '#6366f1' : '#1e293b',
+            color: '#e2e8f0',
             border: 'none',
-            borderRadius: '12px',
+            borderRadius: '8px',
             cursor: (loading || !searchTerm) ? 'not-allowed' : 'pointer',
-            fontSize: '16px',
-            fontWeight: '600',
-            whiteSpace: 'nowrap'
+            fontSize: '14px',
+            fontWeight: '500',
+            transition: 'all 0.2s'
           }}
         >
           {loading ? 'Searching...' : 'Search'}
@@ -108,19 +90,27 @@ export default function SearchPage({ onRate, getUserRating, onAddToWatchlist, is
       </div>
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>
-          <div style={{ fontSize: '48px', marginBottom: '20px' }}>🔄</div>
-          <p>Searching anime...</p>
+        <div style={{ textAlign: 'center', padding: '60px', color: '#64748b' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '3px solid #1e293b',
+            borderTop: '3px solid #6366f1',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+            margin: '0 auto 16px'
+          }} />
+          <p style={{ fontSize: '14px' }}>Searching...</p>
         </div>
       ) : searchResults.length > 0 ? (
         <div>
-          <p style={{ color: '#94a3b8', marginBottom: '30px' }}>
+          <p style={{ color: '#64748b', marginBottom: '24px', fontSize: '14px' }}>
             Found {searchResults.length} results for "{searchTerm}"
           </p>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-            gap: '24px'
+            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+            gap: '20px'
           }}>
             {searchResults.map(anime => (
               <PremiumCard
@@ -135,9 +125,8 @@ export default function SearchPage({ onRate, getUserRating, onAddToWatchlist, is
           </div>
         </div>
       ) : searchTerm && !loading ? (
-        <div style={{ textAlign: 'center', padding: '60px', color: '#94a3b8' }}>
-          <div style={{ fontSize: '48px', marginBottom: '20px' }}>😔</div>
-          <p>No results found for "{searchTerm}"</p>
+        <div style={{ textAlign: 'center', padding: '60px', color: '#64748b' }}>
+          <p style={{ fontSize: '14px' }}>No results found for "{searchTerm}"</p>
         </div>
       ) : null}
     </div>

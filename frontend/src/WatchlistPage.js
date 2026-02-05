@@ -19,28 +19,27 @@ export default function WatchlistPage({ watchlist, watchlistDetails, onRate, get
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: '30px'
+        marginBottom: '24px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <h2 style={{
-            fontSize: '32px',
-            fontWeight: '700',
+            fontSize: '24px',
+            fontWeight: '600',
             margin: 0,
-            background: 'linear-gradient(135deg, #f59e0b 0%, #f97316 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
+            color: '#e2e8f0',
+            letterSpacing: '-0.5px'
           }}>
-            📝 My Watchlist
+            Watchlist
           </h2>
           <div style={{
-            padding: '6px 14px',
-            background: 'rgba(245, 158, 11, 0.15)',
-            borderRadius: '20px',
-            fontSize: '13px',
-            fontWeight: '600',
-            color: '#fbbf24'
+            padding: '4px 10px',
+            background: '#1e293b',
+            borderRadius: '6px',
+            fontSize: '12px',
+            fontWeight: '500',
+            color: '#94a3b8'
           }}>
-            {watchlist.length} to watch
+            {watchlist.length}
           </div>
         </div>
 
@@ -48,20 +47,20 @@ export default function WatchlistPage({ watchlist, watchlistDetails, onRate, get
           <button
             onClick={() => toggleSection('watchlist')}
             style={{
-              padding: '10px 20px',
-              background: 'rgba(245, 158, 11, 0.2)',
-              border: '1px solid rgba(245, 158, 11, 0.3)',
-              borderRadius: '10px',
-              color: '#fbbf24',
+              padding: '8px 16px',
+              background: '#1e293b',
+              border: '1px solid #334155',
+              borderRadius: '6px',
+              color: '#94a3b8',
               cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: '600',
+              fontSize: '13px',
+              fontWeight: '500',
               transition: 'all 0.2s'
             }}
-            onMouseEnter={(e) => e.target.style.background = 'rgba(245, 158, 11, 0.3)'}
-            onMouseLeave={(e) => e.target.style.background = 'rgba(245, 158, 11, 0.2)'}
+            onMouseEnter={(e) => e.target.style.background = '#334155'}
+            onMouseLeave={(e) => e.target.style.background = '#1e293b'}
           >
-            {isExpanded ? '▲ Show Less' : `▼ Show All (${watchlistDetails.length})`}
+            {isExpanded ? 'Show Less' : `Show All (${watchlistDetails.length})`}
           </button>
         )}
       </div>
@@ -70,44 +69,32 @@ export default function WatchlistPage({ watchlist, watchlistDetails, onRate, get
         <div style={{
           textAlign: 'center',
           padding: '80px 20px',
-          background: 'rgba(245, 158, 11, 0.05)',
-          borderRadius: '20px',
-          border: '1px solid rgba(245, 158, 11, 0.1)'
+          background: '#1e293b',
+          borderRadius: '12px',
+          border: '1px solid #334155'
         }}>
-          <div style={{ fontSize: '64px', marginBottom: '20px' }}>📝</div>
-          <h3 style={{ color: '#fbbf24', fontSize: '24px', marginBottom: '12px' }}>
-            Your Watchlist is Empty
+          <h3 style={{ color: '#e2e8f0', fontSize: '18px', marginBottom: '8px', fontWeight: '600' }}>
+            Your watchlist is empty
           </h3>
-          <p style={{ color: '#94a3b8', fontSize: '16px' }}>
-            Browse anime and add shows you want to watch later!
+          <p style={{ color: '#64748b', fontSize: '14px' }}>
+            Add shows you want to watch later.
           </p>
         </div>
       ) : (
-        <div>
-          <p style={{
-            color: '#94a3b8',
-            fontSize: '15px',
-            marginBottom: '30px',
-            lineHeight: '1.6'
-          }}>
-            Anime you've saved to watch later. Rate them once you finish watching! 🎬
-          </p>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-            gap: '24px'
-          }}>
-            {displayList.map(anime => (
-              <WatchlistCard
-                key={anime.id}
-                anime={anime}
-                userRating={getUserRating(anime.id)}
-                onRate={onRate}
-                onRemove={onRemoveFromWatchlist}
-              />
-            ))}
-          </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+          gap: '20px'
+        }}>
+          {displayList.map(anime => (
+            <WatchlistCard
+              key={anime.id}
+              anime={anime}
+              userRating={getUserRating(anime.id)}
+              onRate={onRate}
+              onRemove={onRemoveFromWatchlist}
+            />
+          ))}
         </div>
       )}
     </div>
@@ -123,10 +110,7 @@ function WatchlistCard({ anime, userRating, onRate, onRemove }) {
   const handleRate = async (rating) => {
     setJustRated(true)
     await onRate(anime.id, rating)
-    
-    setTimeout(() => {
-      setJustRated(false)
-    }, 2000)
+    setTimeout(() => setJustRated(false), 1500)
   }
 
   const handleRemove = async () => {
@@ -140,13 +124,11 @@ function WatchlistCard({ anime, userRating, onRate, onRemove }) {
       onMouseLeave={() => setShow(false)}
       style={{
         position: 'relative',
-        borderRadius: '16px',
+        borderRadius: '8px',
         overflow: 'hidden',
-        background: 'rgba(15, 23, 42, 0.6)',
-        border: '1px solid ' + (show ? 'rgba(245, 158, 11, 0.5)' : 'rgba(139, 92, 246, 0.1)'),
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        transform: show ? 'translateY(-8px)' : 'translateY(0)',
-        boxShadow: show ? '0 20px 40px rgba(0, 0, 0, 0.4)' : '0 4px 12px rgba(0, 0, 0, 0.2)',
+        background: '#1e293b',
+        transition: 'all 0.2s',
+        transform: show ? 'translateY(-4px)' : 'translateY(0)',
         cursor: 'pointer',
         opacity: removing ? 0.5 : 1
       }}
@@ -155,20 +137,14 @@ function WatchlistCard({ anime, userRating, onRate, onRemove }) {
         <div style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(59, 130, 246, 0.9) 100%)',
+          background: 'rgba(15, 23, 42, 0.95)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          flexDirection: 'column',
-          gap: '12px',
           zIndex: 100,
-          animation: 'fadeInOut 2s ease-in-out',
-          backdropFilter: 'blur(8px)'
+          animation: 'fadeInOut 1.5s ease-in-out'
         }}>
-          <div style={{ fontSize: '64px', animation: 'scaleUp 0.5s ease-out' }}>⭐</div>
-          <div style={{ fontSize: '20px', fontWeight: '700', color: 'white', animation: 'slideUp 0.5s ease-out' }}>
-            Rated!
-          </div>
+          <div style={{ fontSize: '48px' }}>✓</div>
         </div>
       )}
 
@@ -178,19 +154,15 @@ function WatchlistCard({ anime, userRating, onRate, onRemove }) {
           alt={title}
           style={{
             width: '100%',
-            height: '300px',
+            height: '260px',
             objectFit: 'cover',
-            display: 'block',
-            transition: 'transform 0.3s',
-            transform: show ? 'scale(1.05)' : 'scale(1)'
+            display: 'block'
           }}
         />
         <div style={{
           position: 'absolute',
           inset: 0,
-          background: show 
-            ? 'linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, transparent 60%)' 
-            : 'linear-gradient(to top, rgba(15, 23, 42, 0.7) 0%, transparent 50%)'
+          background: show ? 'linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, transparent 60%)' : 'transparent'
         }} />
       </div>
       
@@ -200,95 +172,60 @@ function WatchlistCard({ anime, userRating, onRate, onRemove }) {
           bottom: 0,
           left: 0,
           right: 0,
-          padding: '20px 16px',
-          background: 'linear-gradient(to top, rgba(15, 23, 42, 0.98) 0%, rgba(15, 23, 42, 0.9) 100%)',
-          backdropFilter: 'blur(12px)'
+          padding: '16px',
+          background: 'rgba(15, 23, 42, 0.98)'
         }}>
           <p style={{
-            fontSize: '14px',
+            fontSize: '13px',
             fontWeight: '600',
-            margin: '0 0 4px 0',
-            color: 'white',
+            margin: '0 0 12px 0',
+            color: '#e2e8f0',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis'
           }}>
             {title}
           </p>
-          
-          {anime.genres && anime.genres.length > 0 && (
-            <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', flexWrap: 'wrap' }}>
-              {anime.genres.slice(0, 2).map(genre => (
-                <span key={genre} style={{
-                  fontSize: '10px',
-                  padding: '3px 8px',
-                  background: 'rgba(139, 92, 246, 0.2)',
-                  borderRadius: '6px',
-                  color: '#c4b5fd',
-                  fontWeight: '500'
-                }}>
-                  {genre}
-                </span>
-              ))}
-            </div>
-          )}
 
           <button
             onClick={handleRemove}
             disabled={removing}
             style={{
               width: '100%',
-              padding: '10px',
-              background: 'rgba(239, 68, 68, 0.2)',
-              border: '1px solid rgba(239, 68, 68, 0.4)',
-              borderRadius: '8px',
-              color: '#fca5a5',
+              padding: '8px',
+              background: '#1e293b',
+              border: '1px solid #334155',
+              borderRadius: '6px',
+              color: '#94a3b8',
               cursor: removing ? 'not-allowed' : 'pointer',
-              fontSize: '13px',
-              fontWeight: '600',
-              marginBottom: '12px',
+              fontSize: '12px',
+              fontWeight: '500',
+              marginBottom: '10px',
               transition: 'all 0.2s'
             }}
-            onMouseEnter={(e) => !removing && (e.target.style.background = 'rgba(239, 68, 68, 0.3)')}
-            onMouseLeave={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.2)'}
           >
-            {removing ? '⏳ Removing...' : '✕ Remove from Watchlist'}
+            {removing ? 'Removing...' : 'Remove'}
           </button>
           
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(5, 1fr)',
-            gap: '6px',
-            marginBottom: '8px'
+            gap: '4px'
           }}>
             {[1,2,3,4,5,6,7,8,9,10].map(r => (
               <button
                 key={r}
                 onClick={() => handleRate(r)}
                 style={{
-                  padding: '8px 4px',
-                  background: userRating === r 
-                    ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                    : 'rgba(139, 92, 246, 0.15)',
-                  color: 'white',
-                  border: userRating === r ? 'none' : '1px solid rgba(139, 92, 246, 0.3)',
-                  borderRadius: '8px',
+                  padding: '6px',
+                  background: userRating === r ? '#6366f1' : '#1e293b',
+                  color: '#e2e8f0',
+                  border: userRating === r ? 'none' : '1px solid #334155',
+                  borderRadius: '4px',
                   cursor: 'pointer',
-                  fontSize: '12px',
-                  fontWeight: userRating === r ? '700' : '500',
+                  fontSize: '11px',
+                  fontWeight: '500',
                   transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  if (userRating !== r) {
-                    e.target.style.background = 'rgba(139, 92, 246, 0.3)'
-                    e.target.style.transform = 'scale(1.05)'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (userRating !== r) {
-                    e.target.style.background = 'rgba(139, 92, 246, 0.15)'
-                    e.target.style.transform = 'scale(1)'
-                  }
                 }}
               >
                 {r}
@@ -298,58 +235,28 @@ function WatchlistCard({ anime, userRating, onRate, onRemove }) {
         </div>
       )}
       
-      {!show && (
-        <div style={{
-          position: 'absolute',
-          top: '12px',
-          left: '12px',
-          padding: '6px 12px',
-          background: 'rgba(245, 158, 11, 0.9)',
-          backdropFilter: 'blur(10px)',
-          borderRadius: '20px',
-          fontSize: '11px',
-          fontWeight: '700',
-          color: 'white',
-          boxShadow: '0 4px 15px rgba(245, 158, 11, 0.4)'
-        }}>
-          📝 Watchlist
-        </div>
-      )}
-      
       {userRating && !show && (
         <div style={{
           position: 'absolute',
-          top: '12px',
-          right: '12px',
-          padding: '8px 14px',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          top: '8px',
+          right: '8px',
+          padding: '4px 8px',
+          background: '#6366f1',
           color: 'white',
-          borderRadius: '20px',
-          fontSize: '13px',
-          fontWeight: '700',
-          boxShadow: '0 4px 15px rgba(102, 126, 234, 0.5)'
+          borderRadius: '4px',
+          fontSize: '11px',
+          fontWeight: '600'
         }}>
-          ⭐ {userRating}
+          ★ {userRating}
         </div>
       )}
 
       <style>{`
         @keyframes fadeInOut {
           0% { opacity: 0; }
-          15% { opacity: 1; }
-          85% { opacity: 1; }
+          20% { opacity: 1; }
+          80% { opacity: 1; }
           100% { opacity: 0; }
-        }
-        
-        @keyframes scaleUp {
-          0% { transform: scale(0) rotate(0deg); }
-          50% { transform: scale(1.2) rotate(180deg); }
-          100% { transform: scale(1) rotate(360deg); }
-        }
-        
-        @keyframes slideUp {
-          0% { transform: translateY(20px); opacity: 0; }
-          100% { transform: translateY(0); opacity: 1; }
         }
       `}</style>
     </div>
